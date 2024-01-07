@@ -15,7 +15,7 @@
         description = "CallCabal2nix template";
       };
       ocaml = {
-        path = ./ocaml/
+        path = ./ocaml;
         description = "Opam-nix template";
       };
     };
