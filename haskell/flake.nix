@@ -8,7 +8,6 @@
       pkgs    = nixpkgs.legacyPackages.${system};
       overlay = final: prev: {
         main = prev.callCabal2nix package ./. { };
-        haskell-aoc-util  = prev.callCabal2nix "haskell-aoc-util" ../../util/haskell-aoc-util { };
       };
       haskellPackages = pkgs.haskellPackages.extend overlay;
     in {
