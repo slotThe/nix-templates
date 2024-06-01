@@ -11,12 +11,16 @@
 
   outputs = { self, nixpkgs, rust-overlay, flake-utils, ... }:
     flake-utils.lib.eachDefaultSystem (system:
-      let overlays = [ (import rust-overlay) ];
-          pkgs     = import nixpkgs { inherit system overlays; };
+      let overlays  = [ (import rust-overlay) ];
+          pkgs      = import nixpkgs { inherit system overlays; };
+          toolchain = (rust-bin.selectLatestNightlyWith (toolchain: toolchain.default)).override {
+            extensions = [ "rustc-codegen-cranelift-preview" ];
+          };
+
       in with pkgs; {
         devShells.default = mkShell {
           buildInputs = [
-            (rust-bin.selectLatestNightlyWith (toolchain: toolchain.default))
+            toolchain
             rust-analyzer
           ];
         };
