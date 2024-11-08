@@ -1,0 +1,15 @@
+auto/
+*-blx.bib
+*.aux
+*.bbl
+*.bib
+*.blg
+*.log
+*.out
+*.pdf
+*.run.xml
+*.synctex.gz
+*.toc
+*.lox
+*.fdb_latexmk
+*.fls

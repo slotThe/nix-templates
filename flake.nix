@@ -18,6 +18,10 @@
         path = ./ocaml;
         description = "Opam-nix template";
       };
+      latex = {
+        path = ./latex;
+        description = "LaTeX template";
+      };
     };
 
     defaultTemplate = self.templates.haskell;
