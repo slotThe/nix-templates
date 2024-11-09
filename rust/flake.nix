@@ -4,8 +4,7 @@
     flake-utils.url = "github:numtide/flake-utils";
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
-      inputs.nixpkgs.follows     = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
@@ -13,7 +12,7 @@
     flake-utils.lib.eachDefaultSystem (system:
       let overlays  = [ (import rust-overlay) ];
           pkgs      = import nixpkgs { inherit system overlays; };
-          toolchain = (rust-bin.selectLatestNightlyWith (toolchain: toolchain.default)).override {
+          toolchain = (pkgs.rust-bin.selectLatestNightlyWith (toolchain: toolchain.default)).override {
             extensions = [ "rustc-codegen-cranelift-preview" ];
           };
 
