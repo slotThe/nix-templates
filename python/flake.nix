@@ -1,39 +1,21 @@
 {
-  inputs = {
-    systems.url = "github:nix-systems/default";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-utils = {
-      url = "github:numtide/flake-utils";
-      inputs.systems.follows = "systems";
-    };
-    poetry2nix = {
-      url = "github:nix-community/poetry2nix";
-      inputs = {
-        nixpkgs.follows     = "nixpkgs";
-        systems.follows     = "systems";
-        flake-utils.follows = "flake-utils";
+  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+  outputs = { self, nixpkgs }:
+    let
+      system  = "x86_64-linux";
+      pkgs    = nixpkgs.legacyPackages.${system};
+    in {
+      devShells.${system}.default = pkgs.mkShell {
+        buildInputs = with pkgs; [
+          python3
+          python3Packages.pip
+          python3Packages.virtualenv
+        ];
+	     shellHook = ''
+          export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib.outPath}/lib:${pkgs.pythonManylinuxPackages.manylinux2014Package}/lib:$LD_LIBRARY_PATH";
+          test -d .nix-venv || ${pkgs.python3.interpreter} -m venv .nix-venv
+          source .nix-venv/bin/activate
+        '';
       };
     };
-  };
-
-  outputs = { self, nixpkgs, flake-utils, poetry2nix, ... }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let pkgs = nixpkgs.legacyPackages.${system}.extend poetry2nix.overlays.default;
-          python = pkgs.python312;
-      in {
-        packages = {
-          inherit python;
-          main = pkgs.mkPoetryApplication { projectDir = self; };
-          default = self.packages.${system}.main;
-        };
-
-        devShells.default = pkgs.mkShell {
-          inputsFrom = [ self.packages.${system}.main ];
-          packages   = [ pkgs.poetry ];
-          nativeBuildInputs = [ pkgs.nodejs_22 python ];
-          shellHook = ''
-            export PROJECT_ROOT="$(pwd)"
-          '';
-        };
-      });
 }
