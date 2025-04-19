@@ -13,3 +13,7 @@ auto/
 *.lox
 *.fdb_latexmk
 *.fls
+*.direnv
+*.nav
+*.snm
+result

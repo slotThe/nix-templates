@@ -6,3 +6,4 @@ flycheck_*.el
 /target/
 *.rs.bk
 Cargo.lock
+result
