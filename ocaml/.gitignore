@@ -1,6 +1,6 @@
 target/
 _build
-.ocamlformat
 _opam/
 .direnv
 result
+.envrc

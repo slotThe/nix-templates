@@ -1,41 +1,23 @@
 {
-  inputs = {
-    nixpkgs.follows = "opam-nix/nixpkgs";
-    flake-utils.url = "github:numtide/flake-utils";
-    opam-nix = {
-      url = "github:tweag/opam-nix";
-      inputs.flake-utils.follows = "flake-utils";
+  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+  outputs = { self, nixpkgs }:
+    let
+      system  = "x86_64-linux";
+      pkgs    = nixpkgs.legacyPackages.${system};
+    in {
+      devShells.${system}.default = pkgs.mkShell {
+        buildInputs = with pkgs; [
+          dune_3
+          opam
+          ocaml
+          ocamlPackages.findlib
+          ocamlPackages.utop
+        ];
+             shellHook = ''
+          export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib.outPath}/lib:$LD_LIBRARY_PATH";
+          test -d _opam || opam switch create .
+          eval $(opam env)
+        '';
+      };
     };
-  };
-  outputs = { self, flake-utils, opam-nix, nixpkgs }:
-    let package = throw "Enter your package name!";
-    in flake-utils.lib.eachDefaultSystem (system:
-      let pkgs = nixpkgs.legacyPackages.${system};
-          queries = {
-            ocaml-lsp-server = "*";
-            ocaml-base-compiler = "*";
-            merlin = "*";
-          };
-          main = opam-nix.lib.${system}.buildDuneProject { } package ./. queries;
-          overlay = final: prev: {
-            ${package} = prev.${package}.overrideAttrs (_: {
-              # Don't leak OCaml dependencies into dependent environments.
-              doNixSupport = false;
-            });
-          };
-          legacyPackages = main.overrideScope' overlay;
-          devPackages = builtins.attrValues
-            (pkgs.lib.getAttrs (builtins.attrNames queries) legacyPackages);
-      in rec {
-        inherit legacyPackages;
-
-        # Executed by `nix build`
-        packages.default = self.legacyPackages.${system}.${package};
-
-        # Used by `nix develop`
-        devShells.default = pkgs.mkShell {
-          buildInputs = devPackages;
-          inputsFrom = [ packages.default ];
-        };
-      });
 }
