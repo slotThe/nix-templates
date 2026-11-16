@@ -13,7 +13,7 @@
           ocamlPackages.findlib
           ocamlPackages.utop
         ];
-             shellHook = ''
+        shellHook = ''
           export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib.outPath}/lib:$LD_LIBRARY_PATH";
           test -d _opam || opam switch create .
           eval $(opam env)
