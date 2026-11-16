@@ -6,13 +6,7 @@
       pkgs    = nixpkgs.legacyPackages.${system};
     in {
       devShells.${system}.default = pkgs.mkShell {
-        buildInputs = with pkgs; [
-          dune_3
-          opam
-          ocaml
-          ocamlPackages.findlib
-          ocamlPackages.utop
-        ];
+        buildInputs = with pkgs; [ opam ];
         shellHook = ''
           export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib.outPath}/lib:$LD_LIBRARY_PATH";
           test -d _opam || opam switch create .
